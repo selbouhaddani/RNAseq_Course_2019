@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="date" content="2019-07-02" />
+
+<title>Biostats for RNAseq - Day 1</title>
+<!-- Material Design fonts -->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="Day1_RNA_exploration_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Day1_RNA_exploration_files/bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Day1_RNA_exploration_files/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<script src="Day1_RNA_exploration_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="Day1_RNA_exploration_files/navigation-1.1/tabsets.js"></script>
+<script src="Day1_RNA_exploration_files/navigation-1.1/codefolding.js"></script>
+<link href="Day1_RNA_exploration_files/magnific-popup-1.1.0/magnific-popup.css" rel="stylesheet" />
+<script src="Day1_RNA_exploration_files/magnific-popup-1.1.0/jquery.magnific-popup.min.js"></script>
+<link href="Day1_RNA_exploration_files/bootstrap_material-0.1/bootstrap-material-design.min.css" rel="stylesheet" />
+<link href="Day1_RNA_exploration_files/bootstrap_material-0.1/ripples.min.css" rel="stylesheet" />
+<script src="Day1_RNA_exploration_files/bootstrap_material-0.1/material.min.js"></script>
+<script src="Day1_RNA_exploration_files/bootstrap_material-0.1/ripples.min.js"></script>
+<link href="Day1_RNA_exploration_files/material-0.1/material.css" rel="stylesheet" />
+<script src="Day1_RNA_exploration_files/material-0.1/material.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    background-color: #ffffff;
+    color: #a0a0a0;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #a0a0a0;  padding-left: 4px; }
+div.sourceCode
+  { color: #1f1c1b; background-color: #ffffff; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span. { color: #1f1c1b; } /* Normal */
+code span.al { color: #bf0303; background-color: #f7e6e6; font-weight: bold; } /* Alert */
+code span.an { color: #ca60ca; } /* Annotation */
+code span.at { color: #0057ae; } /* Attribute */
+code span.bn { color: #b08000; } /* BaseN */
+code span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #924c9d; } /* Char */
+code span.cn { color: #aa5500; } /* Constant */
+code span.co { color: #898887; } /* Comment */
+code span.cv { color: #0095ff; } /* CommentVar */
+code span.do { color: #607880; } /* Documentation */
+code span.dt { color: #0057ae; } /* DataType */
+code span.dv { color: #b08000; } /* DecVal */
+code span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code span.fl { color: #b08000; } /* Float */
+code span.fu { color: #644a9b; } /* Function */
+code span.im { color: #ff5500; } /* Import */
+code span.in { color: #b08000; } /* Information */
+code span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code span.op { color: #1f1c1b; } /* Operator */
+code span.ot { color: #006e28; } /* Other */
+code span.pp { color: #006e28; } /* Preprocessor */
+code span.re { color: #0057ae; background-color: #e0e9f8; } /* RegionMarker */
+code span.sc { color: #3daee9; } /* SpecialChar */
+code span.ss { color: #ff5500; } /* SpecialString */
+code span.st { color: #bf0303; } /* String */
+code span.va { color: #0057ae; } /* Variable */
+code span.vs { color: #bf0303; } /* VerbatimString */
+code span.wa { color: #bf0303; } /* Warning */
+</style>
+
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="header-panel shadow z-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-3">
+        <div id="header">
+    <h1 class="title">Biostats for RNAseq - Day 1</h1>
+                <h4 class="date">2019-07-02</h4>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="container-fluid main-container">
+    <div class="row">
+      <nav class="col-xs-3 menu">
+        <div id="toc">
+        <ul>
+        <li><a href="#introduction-to-prob-and-stats">Introduction to Prob and Stats</a></li>
+        <li><a href="#estimation-and-testing-hypotheses">Estimation and testing hypotheses</a></li>
+        <li><a href="#multiple-testing">Multiple testing</a></li>
+        </ul>
+        </div>
+        
+        
+        
+      </nav>
+     <div class="pages col-xs-9">
+     <div class="row">
+       <div class="col-xs-10">
+
+
+
+<div id="introduction-to-prob-and-stats" class="section level1">
+<h1>Introduction to Prob and Stats</h1>
+<ul>
+<li>Simulate 1000 numbers from a binomial distribution with success probability 0.5, and number of trials 1. Sum the numbers with <code>sum</code>, what does the output represent?</li>
+<li>Now simulate one number from a binomial distribution with the same success probability, but set the number of trials to be 1000. What does the output represent?</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">X_binom &lt;-<span class="st"> </span><span class="kw">rbinom</span>(<span class="dt">n =</span> <span class="dv">1000</span>, <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">prob =</span> <span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">sum</span>(X_binom)</a>
+<a class="sourceLine" id="cb1-3" title="3">X2_binom &lt;-<span class="st"> </span><span class="kw">rbinom</span>(<span class="dt">n =</span> <span class="dv">1</span>, <span class="dt">size =</span> <span class="dv">1000</span>, <span class="dt">prob =</span> <span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4">X2_binom</a></code></pre></div>
+<ul>
+<li>Which distribution can be used to model the number of counts in an RNAseq experiment? Simulate from this distribution, choose the parameter such that it reflects typical RNAseq data.</li>
+<li>Is a normal distribution also reasonable to model RNAseq counts? To support your answer, plot a histogram of the RNAseq counts that you simulated and compare to a normal distribution.</li>
+<li>If the average number of counts is large, how do the poisson and normal distribution compare?</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">X_rnaseq &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">100</span>, <span class="dt">lambda =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">hist</span>(X_rnaseq, <span class="dt">freq =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="kw">lines</span>(<span class="dt">x =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="kw">max</span>(X_rnaseq), <span class="dt">length.out =</span> <span class="dv">1000</span>), <span class="dt">y =</span> <span class="kw">dnorm</span>(<span class="dt">x =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="kw">max</span>(X_rnaseq), </a>
+<a class="sourceLine" id="cb2-4" title="4">    <span class="dt">length.out =</span> <span class="dv">1000</span>), <span class="dt">mean =</span> <span class="kw">mean</span>(X_rnaseq), <span class="dt">sd =</span> <span class="kw">sd</span>(X_rnaseq)))</a></code></pre></div>
+<ul>
+<li>The height in a population is known to be normally distributed with mean 1.80m and standard deviation 0.10m. Simulate 1000 numbers from this population and plot a histogram. Add a normal density curve to the data.</li>
+<li>What are the estimated mean and standard deviation of this sample?</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">X_height &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">1000</span>, <span class="dt">mean =</span> <span class="fl">1.8</span>, <span class="dt">sd =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">hist</span>(X_height, <span class="dt">freq =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="kw">lines</span>(<span class="dt">x =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="kw">max</span>(X_height), <span class="dt">length.out =</span> <span class="dv">1000</span>), <span class="dt">y =</span> <span class="kw">dnorm</span>(<span class="dt">x =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="kw">max</span>(X_height), </a>
+<a class="sourceLine" id="cb3-4" title="4">    <span class="dt">length.out =</span> <span class="dv">1000</span>), <span class="dt">mean =</span> <span class="kw">mean</span>(X_height), <span class="dt">sd =</span> <span class="kw">sd</span>(X_height)))</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co"># text(x = min(X_height), y = 3, pos = 4, labels = paste0(&#39;mean = &#39;,</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co"># round(mean(X_height),3),&#39;\n&#39;,&#39;sd = &#39;,round(sd(X_height),3)))</span></a></code></pre></div>
+</div>
+<div id="estimation-and-testing-hypotheses" class="section level1">
+<h1>Estimation and testing hypotheses</h1>
+<ul>
+<li>Simulate two sets of 100 numbers from a normal distribution. Both groups have mean 1.80 and sd 0.10. Now pretend that you don’t know the true means. What are the estimated means based on these samples? Are they exactly the same? Why (not)?</li>
+<li>What is a suitable hypothesis to test whether the true means are the same?</li>
+<li>Carry out a t-test and calculate the t statistic and p-value of the test. Can you conclude that the means are the same?</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">outp &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">1000</span>, {</a>
+<a class="sourceLine" id="cb4-2" title="2">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="fl">1.8</span>, <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="fl">1.8</span>, <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb4-4" title="4">    <span class="kw">mean</span>(X_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb4-5" title="5">    <span class="kw">mean</span>(X_<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6">    <span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb4-7" title="7">})</a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="kw">mean</span>(outp)</a></code></pre></div>
+<ul>
+<li>If we repeat the above code 1000 times, how often do we reject the null hypothesis (even though there is no true difference)?</li>
+<li>Repeat the same experiment, but now simulate counts from a poisson distribution with rate 3.</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">outp &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">1000</span>, {</a>
+<a class="sourceLine" id="cb5-2" title="2">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">100</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb5-3" title="3">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">100</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb5-4" title="4">    <span class="kw">mean</span>(X_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb5-5" title="5">    <span class="kw">mean</span>(X_<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb5-6" title="6">    <span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb5-7" title="7">})</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="kw">mean</span>(outp)</a></code></pre></div>
+<p>In this exercise, we will do a small power analysis. In such analysis, the power to detect a difference is investigated. It is expected that as the means are more different, the rejection fraction will be higher.</p>
+<ul>
+<li>Write a function with argument <code>second_mean</code> that outputs the mean across 1000 times whether it concluded rejection of the null-hypothesis of equality between means. However, simulate the second group using as mean <code>second_mean</code>. A small hint: wrap the function around the above code and change the second true mean with the <code>second_mean</code>.</li>
+<li>Test the function by running it with <code>second_mean</code> equal to the first mean. Then try out several other values. When is the rejection fraction around 50%?</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">power_analysis &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">second_mean =</span> <span class="dv">3</span>) {</a>
+<a class="sourceLine" id="cb6-2" title="2">    outp &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">1000</span>, {</a>
+<a class="sourceLine" id="cb6-3" title="3">        X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">100</span>, <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb6-4" title="4">        X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">100</span>, second_mean)</a>
+<a class="sourceLine" id="cb6-5" title="5">        <span class="kw">mean</span>(X_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb6-6" title="6">        <span class="kw">mean</span>(X_<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-7" title="7">        <span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb6-8" title="8">    })</a>
+<a class="sourceLine" id="cb6-9" title="9">    <span class="kw">mean</span>(outp)</a>
+<a class="sourceLine" id="cb6-10" title="10">}</a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="kw">plot</span>(<span class="kw">seq</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">10</span>), <span class="kw">sapply</span>(<span class="kw">seq</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dt">length.out =</span> <span class="dv">10</span>), power_analysis), </a>
+<a class="sourceLine" id="cb6-12" title="12">    <span class="dt">ylab =</span> <span class="st">&quot;rejection fraction&quot;</span>)</a></code></pre></div>
+</div>
+<div id="multiple-testing" class="section level1">
+<h1>Multiple testing</h1>
+<p>In the previous section we learned how p-values can be used to decide whether two means are significantly different. In this subsection, we are testing many features at the same time. This is also referred to as the multiple comparison or multiple testing or multiplicity problem. The problem here is that when performing many tests and compare them independently with 0.05, the proportion of false positives becomes very large (and not 5%).</p>
+<ul>
+<li>Generate two samples of size 20 with the same mean and variance, say from a normal distribution. Test whether the means are significantly different. Repeat this 10000 times, and count the number of times all p-values are below 0.05. How many tests are labeled as significant?</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">outp &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">10000</span>, {</a>
+<a class="sourceLine" id="cb7-2" title="2">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">20</span>, <span class="fl">1.8</span>, <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">20</span>, <span class="fl">1.8</span>, <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb7-4" title="4">    <span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb7-5" title="5">})</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="kw">sum</span>(outp)</a></code></pre></div>
+<div id="bonferroni-correction" class="section level2">
+<h2>Bonferroni correction</h2>
+<p>Generate a simulation where 10000 genes are poisson distributed with the same rate parameter for both groups, with sample size 20 in each group. Adjust the code such that the first 100 genes are truly differentially expressed, by increasing the rate for one group.</p>
+<ul>
+<li>Calculate a p-value using a t-test for each gene. Then, sum up all genes that have p-value below 0.05. How many are declared differentially expressed?</li>
+<li>Now apply the Bonferroni correction. How many are declared differentially expressed?</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">DEgenes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb8-2" title="2">outp &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10000</span>, <span class="cf">function</span>(gene_i) {</a>
+<a class="sourceLine" id="cb8-3" title="3">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb8-4" title="4">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="kw">ifelse</span>(gene_i <span class="op">%in%</span><span class="st"> </span>DEgenes, <span class="dv">3</span>, <span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb8-5" title="5">    <span class="kw">return</span>(<span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value)</a>
+<a class="sourceLine" id="cb8-6" title="6">})</a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="kw">sum</span>(outp <span class="op">&lt;</span><span class="st"> </span>(<span class="fl">0.05</span>))</a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="kw">sum</span>(outp <span class="op">&lt;</span><span class="st"> </span>(<span class="fl">0.05</span><span class="op">/</span><span class="dv">10000</span>))</a></code></pre></div>
+<p>In this exercise, we are going to show how the Benjamini-Hochberg procedure works to control the FDR on 0.05.</p>
+<ul>
+<li>First, generate 1000 p-values. For example, consider t-tests on 1000 genes using two groups. Let 100 genes be differentially expressed.</li>
+</ul>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">DEgenes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb9-2" title="2">p_vals_init &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>, <span class="cf">function</span>(gene_i) {</a>
+<a class="sourceLine" id="cb9-3" title="3">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb9-4" title="4">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="kw">ifelse</span>(gene_i <span class="op">%in%</span><span class="st"> </span>DEgenes, <span class="dv">3</span>, <span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb9-5" title="5">    <span class="kw">return</span>(<span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value)</a>
+<a class="sourceLine" id="cb9-6" title="6">})</a></code></pre></div>
+<ul>
+<li>Calculate the FDR for the unadjusted p-values and the bonferroni corrected p-values.</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">V &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="dv">100</span>), <span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">1000</span> <span class="op">-</span><span class="st"> </span><span class="dv">100</span>))</a>
+<a class="sourceLine" id="cb10-2" title="2">R &lt;-<span class="st"> </span>p_vals_init <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="kw">sum</span>(V <span class="op">&amp;</span><span class="st"> </span>R)<span class="op">/</span><span class="kw">sum</span>(R)</a>
+<a class="sourceLine" id="cb10-4" title="4">R.bf &lt;-<span class="st"> </span>p_vals_init <span class="op">&lt;</span><span class="st"> </span>(<span class="fl">0.05</span><span class="op">/</span><span class="dv">1000</span>)</a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="kw">ifelse</span>(<span class="kw">sum</span>(R.bf) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="dv">0</span>, <span class="kw">sum</span>(V <span class="op">&amp;</span><span class="st"> </span>R.bf)<span class="op">/</span><span class="kw">sum</span>(R.bf))</a></code></pre></div>
+<ul>
+<li>Now, sort the p-values and plot the first 150. Also, draw a line that has slope 0.05/1000.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">plot</span>(<span class="kw">sort</span>(p_vals_init)[<span class="dv">1</span><span class="op">:</span><span class="dv">150</span>])</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="fl">0.05</span><span class="op">/</span><span class="dv">1000</span>)</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="kw">max</span>(<span class="kw">which</span>(<span class="kw">sort</span>(p_vals_init) <span class="op">&lt;</span><span class="st"> </span>(<span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>) <span class="op">*</span><span class="st"> </span><span class="fl">0.05</span><span class="op">/</span><span class="dv">1000</span>))</a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="kw">abline</span>(<span class="dt">v =</span> <span class="kw">max</span>(<span class="kw">which</span>(<span class="kw">sort</span>(p_vals_init) <span class="op">&lt;</span><span class="st"> </span>(<span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>) <span class="op">*</span><span class="st"> </span><span class="fl">0.05</span><span class="op">/</span><span class="dv">1000</span>)))</a></code></pre></div>
+<ul>
+<li>Which p-value is largest p-value such that it still falls under the drawn line? How many p-values fall under this line?</li>
+<li>Now use the <code>p.adjust</code> function to obtain FDR adjusted p-values. Plot these values and find how many adjusted p-values fall below 0.05.</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">p_vals_adj &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(p_vals_init, <span class="dt">method =</span> <span class="st">&quot;fdr&quot;</span>)</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">plot</span>(<span class="kw">sort</span>(p_vals_adj)[<span class="dv">1</span><span class="op">:</span><span class="dv">150</span>])</a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="kw">abline</span>(<span class="dt">h =</span> <span class="fl">0.05</span>)</a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="kw">max</span>(<span class="kw">which</span>(<span class="kw">sort</span>(p_vals_adj) <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>)) <span class="op">==</span><span class="st"> </span><span class="kw">max</span>(<span class="kw">which</span>(<span class="kw">sort</span>(p_vals_init) <span class="op">&lt;</span><span class="st"> </span>(<span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>) <span class="op">*</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="st">    </span><span class="fl">0.05</span><span class="op">/</span><span class="dv">1000</span>))</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="kw">abline</span>(<span class="dt">v =</span> <span class="kw">max</span>(<span class="kw">which</span>(<span class="kw">sort</span>(p_vals_adj) <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>)))</a></code></pre></div>
+<ul>
+<li>Now calculate the FDR of the adjusted p-values</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">V &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="dv">100</span>), <span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">1000</span> <span class="op">-</span><span class="st"> </span><span class="dv">100</span>))</a>
+<a class="sourceLine" id="cb13-2" title="2">R.bh &lt;-<span class="st"> </span>p_vals_adj <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="kw">sum</span>(V <span class="op">&amp;</span><span class="st"> </span>R.bh)<span class="op">/</span><span class="kw">sum</span>(R.bh)</a></code></pre></div>
+</div>
+</div>
+
+    </div>
+    <div class="col-xs-2">
+        <div class="btn-toolbar">
+    <div class="btn-group">
+    <a href="#" class="btn btn-raised btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text-muted">Code</span> <span class="text-muted caret"></span></a>
+    <ul class="dropdown-menu" style="min-width: 50px;">
+    <li><a id="rmd-show-all-code" href="#">Show All</a></li>
+    <li><a id="rmd-hide-all-code" href="#">Hide All</a></li>
+    </ul>
+    </div>
+    </div>
+        </div>
+  </div>
+  </div>
+  </div>
+  <div class="row">
+    </div>
+  </div>
+
+<script>
+$(document).ready(function () {
+  // add bootstrap table styles to pandoc tables
+  $('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
+
+    var images = $('.pages img');
+  images.filter(function() {
+      if ($(this).parent().attr("class") == "figure") {
+          return(false)
+      } else {
+          return(true);
+      }
+  }).wrap("<div class='figure'></div>");
+  images.addClass("image-thumb").wrap("<div class='panel-body'></div>");
+  $('.figure p.caption').wrap("<div class='panel-footer'></div>");
+  $('.figure').addClass('panel panel-default');
+  
+    $('.pages img')
+ 	  .addClass("image-lb");
+  $('.pages').magnificPopup({
+	      type:'image',
+	      closeOnContentClick: false,
+	      closeBtnInside: false,
+        delegate: 'img',
+	      gallery: {enabled: false },
+          removalDelay: 500,
+          callbacks: {
+              beforeOpen: function() {
+                // just a hack that adds mfp-anim class to markup
+                this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+              }
+          },
+          mainClass: 'mfp-move-from-top',
+	      image: {
+	        verticalFit: true,
+            titleSrc: 'alt'
+	      }
+ 	    });
+ 	
+    
+    $('#toc ul li').first().addClass("active");
+    $('#toc ul li').attr("data-target", function() {
+        return($(this).children("a").attr("href"));
+    })
+    $('body .section.level1').first().addClass("active");
+    
+    $('#toc a[href*="#"]').click(function() {
+
+      var id = $(this).attr("href");
+      if (id === "#") return;
+      if (id.substring(0, 8) === "#dyntab-") return;
+      toggle_page(id);
+
+      // Menu
+      var menu_entry = $(".menu li[data-target='"+id+"']");
+      menu_entry.addClass("active");
+      $(".menu li").not(menu_entry).removeClass("active"); 
+      
+
+    });
+
+    function toggle_page(id) {
+      $(".page").not(page).removeClass("active").hide();
+      window.page = id;
+      var page = $(window.page);
+      window.location.hash = window.page;
+      //$(this).addClass("active");
+
+      page.show();
+
+      var totop = setInterval(function () {
+        $(".pages").animate({scrollTop: 0}, 0);
+      }, 10);
+
+      setTimeout(function () {
+        page.addClass("active");
+        setTimeout(function () {
+          clearInterval(totop);
+        }, 1000);
+      }, 100);
+
+      window.dispatchEvent(new Event('resize'));
+
+    }
+
+
+    $(".menu li").click(function () {
+
+      toggle_page($(this).data("target"));
+
+      // Menu
+      if (!$(this).data("target")) return;
+      if ($(this).is(".active")) return;
+      $(".menu li").not($(this)).removeClass("active");
+      $(this).addClass("active");
+
+    });
+  
+    
+
+
+    window.page = window.location.hash;
+    if (window.page != "") {
+      $(".menu").find("li[data-target=" + window.page + "]").trigger("click");
+    }
+
+    /* init material bootstrap js */
+    $.material.init();
+});
+</script>
+
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

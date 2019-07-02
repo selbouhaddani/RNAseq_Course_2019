@@ -1,0 +1,196 @@
+---
+title: "Biostats for RNAseq - Day 1"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    highlight: kate
+    self_contained: FALSE
+    code_folding: hide
+---
+
+
+```{r setup, echo=FALSE, cache=FALSE, include=FALSE}
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(#echo=FALSE,
+	             #cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               eval = FALSE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
+```
+
+# Introduction to Prob and Stats
+
+- Simulate 1000 numbers from a binomial distribution with success probability 0.5, and number of trials 1. Sum the numbers with `sum`, what does the output represent? 
+- Now simulate one number from a binomial distribution with the same success probability, but set the number of trials to be 1000. What does the output represent?
+
+```{r}
+X_binom <- rbinom(n = 1000, size = 1, prob = 0.5)
+sum(X_binom)
+X2_binom <- rbinom(n = 1, size = 1000, prob = 0.5)
+X2_binom
+```
+
+- Which distribution can be used to model the number of counts in an RNAseq experiment? Simulate from this distribution, choose the parameter such that it reflects typical RNAseq data. 
+- Is a normal distribution also reasonable to model RNAseq counts? To support your answer, plot a histogram of the RNAseq counts that you simulated and compare to a normal distribution.
+- If the average number of counts is large, how do the poisson and normal distribution compare?
+
+```{r}
+X_rnaseq <- rpois(n = 100, lambda = 3)
+hist(X_rnaseq, freq = FALSE)
+lines(x = seq(0,max(X_rnaseq),length.out = 1000), 
+      y = dnorm(x = seq(0,max(X_rnaseq),length.out = 1000), mean = mean(X_rnaseq), sd = sd(X_rnaseq)))
+```
+
+- The height in a population is known to be normally distributed with mean 1.80m and standard deviation 0.10m. Simulate 1000 numbers from this population and plot a histogram. Add a normal density curve to the data. 
+- What are the estimated mean and standard deviation of this sample? 
+
+```{r}
+X_height <- rnorm(n = 1000, mean = 1.8, sd = 0.1)
+hist(X_height, freq = FALSE)
+lines(x = seq(0,max(X_height),length.out = 1000), 
+      y = dnorm(x = seq(0,max(X_height),length.out = 1000), mean = mean(X_height), sd = sd(X_height)))
+#text(x = min(X_height), y = 3, pos = 4, 
+#     labels = paste0("mean = ", round(mean(X_height),3),"\n","sd = ",round(sd(X_height),3)))
+```
+
+# Estimation and testing hypotheses
+
+- Simulate two sets of 100 numbers from a normal distribution. Both groups have mean 1.80 and sd 0.10. Now pretend that you don't know the true means. What are the estimated means based on these samples? Are they exactly the same? Why (not)?
+- What is a suitable hypothesis to test whether the true means are the same?
+- Carry out a t-test and calculate the t statistic and p-value of the test. Can you conclude that the means are the same?
+
+```{r}
+outp <- replicate(1000, {
+  X_1 <- rnorm(100, 1.80, 0.1)
+  X_2 <- rnorm(100, 1.80, 0.1)
+  mean(X_1)
+  mean(X_2)
+  t.test(X_1, X_2)$p.value < 0.05
+})
+mean(outp)
+```
+
+- If we repeat the above code 1000 times, how often do we reject the null hypothesis (even though there is no true difference)?
+- Repeat the same experiment, but now simulate counts from a poisson distribution with rate 3. 
+
+```{r}
+outp <- replicate(1000, {
+  X_1 <- rpois(100, 3)
+  X_2 <- rpois(100, 3)
+  mean(X_1)
+  mean(X_2)
+  t.test(X_1, X_2)$p.value < 0.05
+})
+mean(outp)
+```
+
+In this exercise, we will do a small power analysis. In such analysis, the power to detect a difference is investigated. It is expected that as the means are more different, the rejection fraction will be higher. 
+
+- Write a function with argument `second_mean` that outputs the mean across 1000 times whether it concluded rejection of the null-hypothesis of equality between means. However, simulate the second group using as mean `second_mean`. A small hint: wrap the function around the above code and change the second true mean with the `second_mean`. 
+- Test the function by running it with `second_mean` equal to the first mean. Then try out several other values. When is the rejection fraction around 50%?
+
+```{r}
+power_analysis <- function(second_mean = 3){
+  outp <- replicate(1000, {
+  X_1 <- rpois(100, 3)
+  X_2 <- rpois(100, second_mean)
+  mean(X_1)
+  mean(X_2)
+  t.test(X_1, X_2)$p.value < 0.05
+})
+mean(outp)
+}
+plot(seq(3,5,length.out = 10), 
+     sapply(seq(3,5,length.out = 10), power_analysis), ylab="rejection fraction")
+```
+
+
+# Multiple testing
+
+In the previous section we learned how p-values can be used to decide whether two means are significantly different. In this subsection, we are testing many features at the same time. This is also referred to as the multiple comparison or multiple testing or multiplicity problem. The problem here is that when performing many tests and compare them independently with 0.05, the proportion of false positives becomes very large (and not 5%).
+
+- Generate two samples of size 20 with the same mean and variance, say from a normal distribution. Test whether the means are significantly different. Repeat this 10000 times, and count the number of times all p-values are below 0.05. How many tests are labeled as significant?
+```{r}
+outp <- replicate(10000, {
+  X_1 <- rnorm(20, 1.80, 0.1)
+  X_2 <- rnorm(20, 1.80, 0.1)
+  t.test(X_1, X_2)$p.value < 0.05
+})
+sum(outp)
+```
+
+## Bonferroni correction
+
+Generate a simulation where 10000 genes are poisson distributed with the same rate parameter for both groups, with sample size 20 in each group. Adjust the code such that the first 100 genes are truly differentially expressed, by increasing the rate for one group. 
+
+- Calculate a p-value using a t-test for each gene. Then, sum up all genes that have p-value below 0.05. How many are declared differentially expressed? 
+- Now apply the Bonferroni correction. How many are declared differentially expressed?
+
+```{r}
+DEgenes <- 1:100
+outp <- sapply(1:1e4, function(gene_i){
+  X_1 <- rpois(n = 20, lambda = 3)
+  X_2 <- rpois(n = 20, lambda = ifelse(gene_i %in% DEgenes, 3, 4))
+  return(t.test(X_1, X_2)$p.value)
+})
+sum(outp < (0.05))
+sum(outp < (0.05/1e4))
+```
+
+In this exercise, we are going to show how the Benjamini-Hochberg procedure works to control the FDR on 0.05. 
+
+- First, generate 1000 p-values. For example, consider t-tests on 1000 genes using two groups. Let 100 genes be differentially expressed.
+```{r}
+DEgenes <- 1:100
+p_vals_init <- sapply(1:1e3, function(gene_i){
+  X_1 <- rpois(n = 20, lambda = 3)
+  X_2 <- rpois(n = 20, lambda = ifelse(gene_i %in% DEgenes, 3, 5))
+  return(t.test(X_1, X_2)$p.value)
+})
+```
+- Calculate the FDR for the unadjusted p-values and the bonferroni corrected p-values. 
+```{r}
+V <- c(rep(FALSE,100),rep(TRUE,1000-100))
+R <- p_vals_init < 0.05
+sum(V & R)/sum(R)
+R.bf <- p_vals_init < (0.05/1e3)
+ifelse(sum(R.bf)==0, 0, sum(V & R.bf)/sum(R.bf))
+
+```
+
+- Now, sort the p-values and plot the first 150. Also, draw a line that has slope 0.05/1000.
+```{r}
+plot(sort(p_vals_init)[1:150])
+abline(a = 0, b = 0.05/1000)
+max(which(sort(p_vals_init) < (1:1000)*0.05/1000))
+abline(v=max(which(sort(p_vals_init) < (1:1000)*0.05/1000)))
+```
+
+
+- Which p-value is largest p-value such that it still falls under the drawn line? How many p-values fall under this line?
+- Now use the `p.adjust` function to obtain FDR adjusted p-values. Plot these values and find how many adjusted p-values fall below 0.05.
+```{r}
+p_vals_adj <- p.adjust(p_vals_init, method = "fdr")
+plot(sort(p_vals_adj)[1:150])
+abline(h=0.05)
+max(which(sort(p_vals_adj) < 0.05)) == max(which(sort(p_vals_init) < (1:1000)*0.05/1000))
+abline(v=max(which(sort(p_vals_adj) < 0.05)))
+```
+- Now calculate the FDR of the adjusted p-values
+```{r}
+V <- c(rep(FALSE,100),rep(TRUE,1000-100))
+R.bh <- p_vals_adj < 0.05
+sum(V & R.bh)/sum(R.bh)
+```
+
+
+
+
