@@ -138,7 +138,7 @@ Generate a simulation where 10000 genes are poisson distributed with the same ra
 DEgenes <- 1:100
 outp <- sapply(1:1e4, function(gene_i){
   X_1 <- rpois(n = 20, lambda = 3)
-  X_2 <- rpois(n = 20, lambda = ifelse(gene_i %in% DEgenes, 3, 4))
+  X_2 <- rpois(n = 20, lambda = ifelse(gene_i %in% DEgenes, 5, 3))
   return(t.test(X_1, X_2)$p.value)
 })
 sum(outp < (0.05))
@@ -152,7 +152,7 @@ In this exercise, we are going to show how the Benjamini-Hochberg procedure work
 DEgenes <- 1:100
 p_vals_init <- sapply(1:1e3, function(gene_i){
   X_1 <- rpois(n = 20, lambda = 3)
-  X_2 <- rpois(n = 20, lambda = ifelse(gene_i %in% DEgenes, 3, 5))
+  X_2 <- rpois(n = 20, lambda = ifelse(gene_i %in% DEgenes, 5, 3))
   return(t.test(X_1, X_2)$p.value)
 })
 ```

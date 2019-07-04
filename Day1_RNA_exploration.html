@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="date" content="2019-07-02" />
+<meta name="date" content="2019-07-04" />
 
 <title>Biostats for RNAseq - Day 1</title>
 <!-- Material Design fonts -->
@@ -125,7 +125,7 @@ $(document).ready(function () {
             <div class="col-xs-3">
         <div id="header">
     <h1 class="title">Biostats for RNAseq - Day 1</h1>
-                <h4 class="date">2019-07-02</h4>
+                <h4 class="date">2019-07-04</h4>
         </div>
     </div>
 </div>
@@ -250,7 +250,7 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">DEgenes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a>
 <a class="sourceLine" id="cb8-2" title="2">outp &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10000</span>, <span class="cf">function</span>(gene_i) {</a>
 <a class="sourceLine" id="cb8-3" title="3">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb8-4" title="4">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="kw">ifelse</span>(gene_i <span class="op">%in%</span><span class="st"> </span>DEgenes, <span class="dv">3</span>, <span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb8-4" title="4">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="kw">ifelse</span>(gene_i <span class="op">%in%</span><span class="st"> </span>DEgenes, <span class="dv">5</span>, <span class="dv">3</span>))</a>
 <a class="sourceLine" id="cb8-5" title="5">    <span class="kw">return</span>(<span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value)</a>
 <a class="sourceLine" id="cb8-6" title="6">})</a>
 <a class="sourceLine" id="cb8-7" title="7"><span class="kw">sum</span>(outp <span class="op">&lt;</span><span class="st"> </span>(<span class="fl">0.05</span>))</a>
@@ -262,7 +262,7 @@ $(document).ready(function () {
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">DEgenes &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a>
 <a class="sourceLine" id="cb9-2" title="2">p_vals_init &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>, <span class="cf">function</span>(gene_i) {</a>
 <a class="sourceLine" id="cb9-3" title="3">    X_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb9-4" title="4">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="kw">ifelse</span>(gene_i <span class="op">%in%</span><span class="st"> </span>DEgenes, <span class="dv">3</span>, <span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb9-4" title="4">    X_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">20</span>, <span class="dt">lambda =</span> <span class="kw">ifelse</span>(gene_i <span class="op">%in%</span><span class="st"> </span>DEgenes, <span class="dv">5</span>, <span class="dv">3</span>))</a>
 <a class="sourceLine" id="cb9-5" title="5">    <span class="kw">return</span>(<span class="kw">t.test</span>(X_<span class="dv">1</span>, X_<span class="dv">2</span>)<span class="op">$</span>p.value)</a>
 <a class="sourceLine" id="cb9-6" title="6">})</a></code></pre></div>
 <ul>
