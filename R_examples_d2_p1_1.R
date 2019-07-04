@@ -1,0 +1,5 @@
+gene1 <- scale(rnorm(100))
+gene2 <- scale(gene1 + rnorm(100, sd=0.2*sd(gene1)))
+plot(gene1, gene2)
+abline(0,1)
+abline(0,-4)

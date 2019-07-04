@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="date" content="2019-07-04" />
+
+<title>Biostats for RNAseq - Day 2</title>
+<!-- Material Design fonts -->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="Day2_PCA_O2PLS_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Day2_PCA_O2PLS_files/bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Day2_PCA_O2PLS_files/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<script src="Day2_PCA_O2PLS_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="Day2_PCA_O2PLS_files/navigation-1.1/tabsets.js"></script>
+<script src="Day2_PCA_O2PLS_files/navigation-1.1/codefolding.js"></script>
+<link href="Day2_PCA_O2PLS_files/magnific-popup-1.1.0/magnific-popup.css" rel="stylesheet" />
+<script src="Day2_PCA_O2PLS_files/magnific-popup-1.1.0/jquery.magnific-popup.min.js"></script>
+<link href="Day2_PCA_O2PLS_files/bootstrap_material-0.1/bootstrap-material-design.min.css" rel="stylesheet" />
+<link href="Day2_PCA_O2PLS_files/bootstrap_material-0.1/ripples.min.css" rel="stylesheet" />
+<script src="Day2_PCA_O2PLS_files/bootstrap_material-0.1/material.min.js"></script>
+<script src="Day2_PCA_O2PLS_files/bootstrap_material-0.1/ripples.min.js"></script>
+<link href="Day2_PCA_O2PLS_files/material-0.1/material.css" rel="stylesheet" />
+<script src="Day2_PCA_O2PLS_files/material-0.1/material.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    background-color: #ffffff;
+    color: #a0a0a0;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #a0a0a0;  padding-left: 4px; }
+div.sourceCode
+  { color: #1f1c1b; background-color: #ffffff; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span. { color: #1f1c1b; } /* Normal */
+code span.al { color: #bf0303; background-color: #f7e6e6; font-weight: bold; } /* Alert */
+code span.an { color: #ca60ca; } /* Annotation */
+code span.at { color: #0057ae; } /* Attribute */
+code span.bn { color: #b08000; } /* BaseN */
+code span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #924c9d; } /* Char */
+code span.cn { color: #aa5500; } /* Constant */
+code span.co { color: #898887; } /* Comment */
+code span.cv { color: #0095ff; } /* CommentVar */
+code span.do { color: #607880; } /* Documentation */
+code span.dt { color: #0057ae; } /* DataType */
+code span.dv { color: #b08000; } /* DecVal */
+code span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code span.fl { color: #b08000; } /* Float */
+code span.fu { color: #644a9b; } /* Function */
+code span.im { color: #ff5500; } /* Import */
+code span.in { color: #b08000; } /* Information */
+code span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code span.op { color: #1f1c1b; } /* Operator */
+code span.ot { color: #006e28; } /* Other */
+code span.pp { color: #006e28; } /* Preprocessor */
+code span.re { color: #0057ae; background-color: #e0e9f8; } /* RegionMarker */
+code span.sc { color: #3daee9; } /* SpecialChar */
+code span.ss { color: #ff5500; } /* SpecialString */
+code span.st { color: #bf0303; } /* String */
+code span.va { color: #0057ae; } /* Variable */
+code span.vs { color: #bf0303; } /* VerbatimString */
+code span.wa { color: #bf0303; } /* Warning */
+</style>
+
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="header-panel shadow z-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-3">
+        <div id="header">
+    <h1 class="title">Biostats for RNAseq - Day 2</h1>
+                <h4 class="date">2019-07-04</h4>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="container-fluid main-container">
+    <div class="row">
+      <nav class="col-xs-3 menu">
+        <div id="toc">
+        <ul>
+        <li><a href="#principal-components-analysis">Principal components analysis</a></li>
+        <li><a href="#data-integration-with-o2pls">Data integration with O2PLS</a></li>
+        </ul>
+        </div>
+        
+        
+        
+      </nav>
+     <div class="pages col-xs-9">
+     <div class="row">
+       <div class="col-xs-10">
+
+
+
+<div id="principal-components-analysis" class="section level1">
+<h1>Principal components analysis</h1>
+<div id="simulated-example" class="section level2">
+<h2>Simulated example</h2>
+<p>The simulated data consist of 100 samples and 100 “transcripts” in dataset X and 200 “regulatory regions” in dataset Y. Furthermore, a continuous and binary outcome is available for prediction and visualisation.</p>
+<ul>
+<li>Load the data. What are the dimensions of X and Y?</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(gplots)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co">## Load simulated data</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">load</span>(<span class="st">&quot;simulated_dataset_outcome_p100.RData&quot;</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co">## We attach the dataset</span></a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="cf">if</span> (<span class="op">!</span><span class="kw">exists</span>(<span class="st">&quot;outcome_class&quot;</span>)) <span class="kw">attach</span>(simulated_dataset_outcome)</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="kw">cat</span>(<span class="st">&quot;dimensions of X:&quot;</span>, <span class="kw">dim</span>(X), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="kw">cat</span>(<span class="st">&quot;dimensions of Y:&quot;</span>, <span class="kw">dim</span>(Y), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a></code></pre></div>
+<ul>
+<li>In the code below a function is defined to plot a heatmap of the correlations between the simulated genes and regions. Plot the two heatmaps, as well as boxplots of the data. Do you see some structure in the data?</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co">## we need the gplots package</span></a>
+<a class="sourceLine" id="cb2-2" title="2">hm &lt;-<span class="st"> </span><span class="cf">function</span>(X) {</a>
+<a class="sourceLine" id="cb2-3" title="3">    gplots<span class="op">::</span><span class="kw">heatmap.2</span>(<span class="kw">cor</span>(X), <span class="dt">Rowv =</span> <span class="ot">FALSE</span>, <span class="dt">Colv =</span> <span class="ot">FALSE</span>, <span class="dt">dendrogram =</span> <span class="st">&quot;none&quot;</span>, </a>
+<a class="sourceLine" id="cb2-4" title="4">        <span class="dt">col =</span> gplots<span class="op">::</span><span class="kw">bluered</span>(<span class="dv">100</span>), <span class="dt">trace =</span> <span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb2-5" title="5">}</a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="co">## Some descriptives</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="kw">boxplot</span>(X)</a>
+<a class="sourceLine" id="cb2-8" title="8"><span class="kw">boxplot</span>(Y)</a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="kw">hm</span>(X)</a>
+<a class="sourceLine" id="cb2-10" title="10"><span class="kw">hm</span>(Y)</a></code></pre></div>
+<ul>
+<li>Now, a PCA is performed to inspect the structure of the data. First, we define how to do PCA using a computationally efficient algorithm. The output is an object recognized by <code>prcomp</code>. The <code>loadings</code> object contain the actual loadings.</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">princomp_fast &lt;-<span class="st"> </span><span class="cf">function</span>(x, nr_comp) {</a>
+<a class="sourceLine" id="cb3-2" title="2">    x &lt;-<span class="st"> </span><span class="kw">scale</span>(x, <span class="dt">scale =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3">    s &lt;-<span class="st"> </span><span class="kw">svd</span>(x, nr_comp, nr_comp)</a>
+<a class="sourceLine" id="cb3-4" title="4">    ret &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">sdev =</span> s<span class="op">$</span>d[<span class="dv">1</span><span class="op">:</span>nr_comp], <span class="dt">loadings =</span> <span class="kw">structure</span>(s<span class="op">$</span>v, <span class="dt">class =</span> <span class="st">&quot;loadings&quot;</span>), </a>
+<a class="sourceLine" id="cb3-5" title="5">        <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>, <span class="dt">n.obs =</span> <span class="kw">nrow</span>(x), <span class="dt">call =</span> <span class="st">&quot;Fast princomp&quot;</span>, </a>
+<a class="sourceLine" id="cb3-6" title="6">        <span class="dt">scores =</span> s<span class="op">$</span>u <span class="op">%*%</span><span class="st"> </span><span class="kw">diag</span>(s<span class="op">$</span>d[<span class="dv">1</span><span class="op">:</span>nr_comp], nr_comp))</a>
+<a class="sourceLine" id="cb3-7" title="7">    <span class="kw">class</span>(ret) &lt;-<span class="st"> &quot;princomp&quot;</span></a>
+<a class="sourceLine" id="cb3-8" title="8">    ret</a>
+<a class="sourceLine" id="cb3-9" title="9">}</a></code></pre></div>
+<ul>
+<li>Fit a PCA to the X data. How many components seem reasonable? Why?</li>
+<li>Plot the first two loading components against each other. Also plot the first two scores. Which genes and samples are influential? You can use <code>identify</code> to identify points</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">princomp_fast</span>(X, <span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">princomp_fast</span>(X, <span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3"></a>
+<a class="sourceLine" id="cb4-4" title="4">fit_pca &lt;-<span class="st"> </span><span class="kw">princomp_fast</span>(X, <span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="kw">plot</span>(fit_pca<span class="op">$</span>loadings)</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="co"># identify(fit_pca$loadings)</span></a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="kw">plot</span>(fit_pca<span class="op">$</span>scores)</a></code></pre></div>
+<ul>
+<li>Now add some color to the scoresplot, use the <code>outcome_class+1</code> as labels. Any remarkable grouping? NB we will revisit these data using O2PLS.</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">plot</span>(fit_pca<span class="op">$</span>scores, <span class="dt">col =</span> outcome_class <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a></code></pre></div>
+</div>
+<div id="optional-similar-analysis" class="section level2">
+<h2>(Optional) Similar analysis</h2>
+<p>Repeat similar analysis, but use the <code>simulated_dataset_outcome_p1e4.RData</code> datasets. Note that these data are of much higher dimension, so be careful not to crash your laptop (before saving your data).</p>
+</div>
+</div>
+<div id="data-integration-with-o2pls" class="section level1">
+<h1>Data integration with O2PLS</h1>
+<div id="simulated-example-1" class="section level2">
+<h2>Simulated example</h2>
+<ul>
+<li>Fit an O2PLS model to the X and Y datasets, using 3 joint and 3 specific components for both.</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">library</span>(OmicsPLS)</a>
+<a class="sourceLine" id="cb6-2" title="2">fit &lt;-<span class="st"> </span><span class="kw">o2m</span>(X, Y, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>)</a></code></pre></div>
+<ul>
+<li>Plot the loadings of the O2PLS fit using <code>plot</code>. You can press <code>tab</code> to find out more about the arguments of the plot function.</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">plot</span>(fit, <span class="st">&quot;Xj&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">plot</span>(fit, <span class="st">&quot;Yj&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>)</a></code></pre></div>
+<ul>
+<li>Now plot the scores and add some color to the scoresplot, use the <code>outcome_class+1</code> as labels. Any remarkable grouping or pattern?</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">plot</span>(<span class="kw">scores</span>(fit, <span class="st">&quot;Xj&quot;</span>), <span class="dt">col =</span> outcome_class <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="kw">plot</span>(<span class="kw">scores</span>(fit, <span class="st">&quot;Yj&quot;</span>), <span class="dt">col =</span> outcome_class <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
+</div>
+<div id="real-data-example" class="section level2">
+<h2>Real data example</h2>
+<p>Here, we will use microarray gene expression data and metabolite abundances to illustrate the O2PLS integration. - Load the data that are stored in <code>rna_metab.RData</code>. Inspect the data using boxplots and a heatmap.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">load</span>(<span class="st">&quot;rna_metab.RData&quot;</span>)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="kw">dim</span>(rna)</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="kw">dim</span>(metab)</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="kw">boxplot</span>(metab)</a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="kw">boxplot</span>(rna[, <span class="dv">1</span><span class="op">:</span><span class="dv">100</span>])</a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="kw">hm</span>(metab)</a></code></pre></div>
+<ul>
+<li>Now fit a pca model with 2 components and an O2PLS model with 2 joint, 1 rna-specific and 10 metabolite-specific components to the data.</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">fit_pca_rna &lt;-<span class="st"> </span><span class="kw">princomp_fast</span>(rna, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-2" title="2">fit_pca_metab &lt;-<span class="st"> </span><span class="kw">princomp_fast</span>(metab, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb10-3" title="3">fit_o2m &lt;-<span class="st"> </span><span class="kw">o2m</span>(rna, metab, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb10-4" title="4">fit &lt;-<span class="st"> </span>fit_o2m</a></code></pre></div>
+<ul>
+<li>Run the code below, perhaps you need to install some packages. Briefly, the code plots the loadings of the metabolite and expression data of the first two components. It also annotates top genes as well as metabolite grouping. Uncomment the first two lines and comment out the third line to plot the loadings of the PCA fit.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co">#fit$W. &lt;- fit_pca_rna$loadings</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="co">#fit$C. &lt;- fit_pca_metab$loadings</span></a>
+<a class="sourceLine" id="cb11-3" title="3">fit &lt;-<span class="st"> </span>fit_o2m</a>
+<a class="sourceLine" id="cb11-4" title="4"></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="kw">library</span>(magrittr)</a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="kw">library</span>(gridExtra)</a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="kw">library</span>(illuminaHumanv3.db)</a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="co"># Color names</span></a>
+<a class="sourceLine" id="cb11-10" title="10">LLmodule &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;ILMN_1690209&quot;</span>,<span class="st">&#39;ILMN_1766551&#39;</span>, <span class="st">&#39;ILMN_1749131&#39;</span>, <span class="st">&#39;ILMN_1688423&#39;</span>, </a>
+<a class="sourceLine" id="cb11-11" title="11">              <span class="st">&#39;ILMN_2102670&#39;</span>, <span class="st">&#39;ILMN_1792323&#39;</span>, <span class="st">&#39;ILMN_1899034&#39;</span>, <span class="st">&#39;ILMN_1806721&#39;</span>, </a>
+<a class="sourceLine" id="cb11-12" title="12">              <span class="st">&#39;ILMN_1695530&#39;</span>, <span class="st">&#39;ILMN_1726114&#39;</span>, <span class="st">&#39;ILMN_1751625&#39;</span>, <span class="st">&#39;ILMN_1726114&#39;</span>, </a>
+<a class="sourceLine" id="cb11-13" title="13">              <span class="st">&#39;ILMN_1753648&#39;</span>, <span class="st">&#39;ILMN_1779043&#39;</span>)</a>
+<a class="sourceLine" id="cb11-14" title="14">LLnr &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">colnames</span>(rna) <span class="op">%in%</span><span class="st"> </span>LLmodule)</a>
+<a class="sourceLine" id="cb11-15" title="15">rna_genenames &lt;-<span class="st"> </span><span class="kw">select</span>(illuminaHumanv3.db, </a>
+<a class="sourceLine" id="cb11-16" title="16">                        <span class="dt">keys =</span> <span class="kw">colnames</span>(rna)[LLnr], </a>
+<a class="sourceLine" id="cb11-17" title="17">                        <span class="dt">keytype =</span> <span class="st">&quot;PROBEID&quot;</span>, <span class="dt">columns =</span> <span class="st">&quot;SYMBOL&quot;</span>)[,<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb11-18" title="18"></a>
+<a class="sourceLine" id="cb11-19" title="19">name_col &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">sapply</span>( <span class="co">#First sapply loops over column names</span></a>
+<a class="sourceLine" id="cb11-20" title="20">  <span class="dt">X =</span> <span class="kw">colnames</span>(metab),</a>
+<a class="sourceLine" id="cb11-21" title="21">  <span class="dt">FUN =</span> <span class="cf">function</span>(arg){</a>
+<a class="sourceLine" id="cb11-22" title="22">    <span class="kw">crossprod</span>(</a>
+<a class="sourceLine" id="cb11-23" title="23">      <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>), <span class="co"># Weights to be used as categories</span></a>
+<a class="sourceLine" id="cb11-24" title="24">      <span class="kw">sapply</span>(<span class="kw">c</span>(<span class="st">&quot;VLDL&quot;</span>, <span class="st">&quot;LDL&quot;</span>, <span class="st">&quot;IDL&quot;</span>, <span class="st">&quot;HDL&quot;</span>,<span class="st">&quot;FA&quot;</span>), <span class="co"># metabolite classes</span></a>
+<a class="sourceLine" id="cb11-25" title="25">             <span class="cf">function</span>(arg2){<span class="kw">grepl</span>(arg2, arg)} <span class="co"># compare class of metabolites</span></a>
+<a class="sourceLine" id="cb11-26" title="26">      )</a>
+<a class="sourceLine" id="cb11-27" title="27">    )</a>
+<a class="sourceLine" id="cb11-28" title="28">    }</a>
+<a class="sourceLine" id="cb11-29" title="29">  )</a>
+<a class="sourceLine" id="cb11-30" title="30">name_col &lt;-<span class="st"> </span><span class="kw">factor</span>(name_col, </a>
+<a class="sourceLine" id="cb11-31" title="31">                   <span class="dt">levels =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span><span class="op">:</span><span class="dv">6</span>,<span class="dv">1</span>), </a>
+<a class="sourceLine" id="cb11-32" title="32">                   <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;VLDL&quot;</span>, <span class="st">&quot;LDL&quot;</span>, <span class="st">&quot;IDL&quot;</span>, <span class="st">&quot;HDL&quot;</span>,<span class="st">&quot;FA&quot;</span>,<span class="st">&quot;Other&quot;</span>))</a>
+<a class="sourceLine" id="cb11-33" title="33"></a>
+<a class="sourceLine" id="cb11-34" title="34"><span class="co"># alpmetab &lt;- loadings(fit, &quot;Yjoint&quot;, 1:2) %&gt;%  # Retreive loadings</span></a>
+<a class="sourceLine" id="cb11-35" title="35"><span class="co">#   abs %&gt;% # Absolute loading values for positive weights</span></a>
+<a class="sourceLine" id="cb11-36" title="36"><span class="co">#   rowSums %&gt;% # Sum over the components</span></a>
+<a class="sourceLine" id="cb11-37" title="37"><span class="co">#   sqrt + (name_col!=&quot;Other&quot;) # Take square root</span></a>
+<a class="sourceLine" id="cb11-38" title="38"></a>
+<a class="sourceLine" id="cb11-39" title="39"><span class="co">######### Plot loadings with OmicsPLS plot method </span><span class="al">###</span></a>
+<a class="sourceLine" id="cb11-40" title="40">p_metab &lt;-<span class="st"> </span><span class="kw">plot</span>(fit, <span class="dt">loading_name=</span><span class="st">&quot;Yj&quot;</span>, <span class="dt">i=</span><span class="dv">1</span>, <span class="dt">j=</span><span class="dv">2</span>, <span class="dt">label=</span><span class="st">&quot;c&quot;</span>, <span class="co"># Plot the loadings</span></a>
+<a class="sourceLine" id="cb11-41" title="41">             <span class="dt">alpha=</span><span class="dv">0</span>) <span class="op">+</span><span class="st"> </span><span class="co"># set points to be 100% transparant</span></a>
+<a class="sourceLine" id="cb11-42" title="42"><span class="co">##################### Add all layers </span><span class="al">###</span></a>
+<a class="sourceLine" id="cb11-43" title="43"><span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-44" title="44"><span class="st">  </span><span class="kw">coord_fixed</span>(<span class="dt">ratio =</span> <span class="dv">1</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span>.<span class="dv">2</span>,.<span class="dv">2</span>),<span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span>.<span class="dv">2</span>,.<span class="dv">2</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-45" title="45"><span class="st">  </span><span class="kw">geom_point</span>( <span class="co"># Set color and size</span></a>
+<a class="sourceLine" id="cb11-46" title="46">    <span class="kw">aes</span>(<span class="dt">col=</span>name_col, <span class="dt">size =</span> <span class="kw">I</span>(<span class="dv">1</span><span class="op">+</span>(name_col<span class="op">%in%</span><span class="kw">c</span>(<span class="st">&quot;VLDL&quot;</span>,<span class="st">&quot;HDL&quot;</span>))), </a>
+<a class="sourceLine" id="cb11-47" title="47">          <span class="dt">shape =</span> name_col),<span class="dt">show.legend =</span> T) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-48" title="48"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&quot;right&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-49" title="49"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="dt">name=</span><span class="st">&quot;Metabolite</span><span class="ch">\n</span><span class="st">Group&quot;</span>,</a>
+<a class="sourceLine" id="cb11-50" title="50">                       <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;VLDL&quot;</span>, <span class="st">&quot;LDL&quot;</span>, <span class="st">&quot;IDL&quot;</span>, <span class="st">&quot;HDL&quot;</span>,<span class="st">&quot;FA&quot;</span>,<span class="st">&quot;Other&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-51" title="51"><span class="st">  </span><span class="kw">guides</span>(<span class="dt">size=</span>F) <span class="op">+</span><span class="st"> </span><span class="kw">scale_shape_discrete</span>(<span class="dt">name=</span><span class="st">&quot;Metabolite</span><span class="ch">\n</span><span class="st">Group&quot;</span>,</a>
+<a class="sourceLine" id="cb11-52" title="52">                                <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;VLDL&quot;</span>, <span class="st">&quot;LDL&quot;</span>, <span class="st">&quot;IDL&quot;</span>, <span class="st">&quot;HDL&quot;</span>,<span class="st">&quot;FA&quot;</span>,<span class="st">&quot;Other&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-53" title="53"><span class="st">  </span><span class="kw">scale_shape_manual</span>(<span class="dt">name=</span><span class="st">&quot;Metabolite</span><span class="ch">\n</span><span class="st">Group&quot;</span>, <span class="dt">values=</span><span class="kw">c</span>(<span class="dv">15</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">17</span>,<span class="dv">5</span>,<span class="dv">6</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-54" title="54"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Metabolite joint loadings&quot;</span>,</a>
+<a class="sourceLine" id="cb11-55" title="55">       <span class="dt">x =</span> <span class="st">&quot;First Joint Loadings&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Second Joint Loadings&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-56" title="56"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">face=</span><span class="st">&#39;bold&#39;</span>),</a>
+<a class="sourceLine" id="cb11-57" title="57">        <span class="dt">legend.title=</span><span class="kw">element_text</span>(<span class="dt">face=</span><span class="st">&#39;bold&#39;</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-58" title="58"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb11-59" title="59"></a>
+<a class="sourceLine" id="cb11-60" title="60">alprna &lt;-<span class="st"> </span><span class="kw">loadings</span>(fit, <span class="st">&quot;Xjoint&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">raise_to_power</span>(<span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span>rowSums</a>
+<a class="sourceLine" id="cb11-61" title="61">alprna[<span class="op">-</span>(<span class="kw">order</span>(alprna,<span class="dt">decreasing=</span>T)[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>])] =<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb11-62" title="62">alprna &lt;-<span class="st"> </span><span class="kw">sign</span>(alprna)</a>
+<a class="sourceLine" id="cb11-63" title="63">toprna &lt;-<span class="st"> </span><span class="kw">which</span>(alprna<span class="op">&gt;</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb11-64" title="64">names_rna &lt;-<span class="st"> </span><span class="kw">mapIds</span>(illuminaHumanv3.db, </a>
+<a class="sourceLine" id="cb11-65" title="65">       <span class="dt">keys =</span> <span class="kw">colnames</span>(rna)[toprna], </a>
+<a class="sourceLine" id="cb11-66" title="66">       <span class="dt">keytype =</span> <span class="st">&quot;PROBEID&quot;</span>, </a>
+<a class="sourceLine" id="cb11-67" title="67">       <span class="dt">column =</span> <span class="st">&quot;SYMBOL&quot;</span>,</a>
+<a class="sourceLine" id="cb11-68" title="68">       <span class="dt">multiVals =</span> <span class="st">&#39;first&#39;</span>)</a>
+<a class="sourceLine" id="cb11-69" title="69">names_rna[<span class="kw">which</span>(<span class="kw">is.na</span>(names_rna))] &lt;-<span class="st"> &quot;?&quot;</span></a>
+<a class="sourceLine" id="cb11-70" title="70"><span class="co">######### Plot loadings with OmicsPLS plot method </span><span class="al">###</span></a>
+<a class="sourceLine" id="cb11-71" title="71">p_rna &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="kw">data.frame</span>(<span class="dt">x =</span> fit<span class="op">$</span>W.[, <span class="dv">1</span>], <span class="dt">y =</span> fit<span class="op">$</span>W.[, <span class="dv">2</span>]), </a>
+<a class="sourceLine" id="cb11-72" title="72">                <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y),</a>
+<a class="sourceLine" id="cb11-73" title="73">                <span class="dt">alpha =</span> alprna,</a>
+<a class="sourceLine" id="cb11-74" title="74">                <span class="kw">aes</span>(<span class="dt">label =</span> <span class="ot">NA</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-75" title="75"><span class="st">    </span><span class="co">##################### Add all layers </span><span class="al">###</span></a>
+<a class="sourceLine" id="cb11-76" title="76"><span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-77" title="77"><span class="st">  </span><span class="kw">coord_fixed</span>(.<span class="dv">8</span>, <span class="kw">c</span>(<span class="op">-</span>.<span class="dv">15</span>,.<span class="dv">15</span>),<span class="kw">c</span>(<span class="op">-</span>.<span class="dv">15</span>,.<span class="dv">15</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-78" title="78"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">col =</span> <span class="st">&#39;grey&#39;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-79" title="79"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x=</span>fit<span class="op">$</span>W.[LLnr,<span class="dv">1</span>],<span class="dt">y=</span>fit<span class="op">$</span>W.[LLnr,<span class="dv">2</span>]),</a>
+<a class="sourceLine" id="cb11-80" title="80">             <span class="dt">shape =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="dv">2</span>, <span class="dt">size =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-81" title="81"><span class="st">  </span><span class="kw">geom_text</span>(<span class="dt">data =</span> <span class="kw">data.frame</span>(<span class="dt">x=</span>fit<span class="op">$</span>W.[toprna,<span class="dv">1</span>],<span class="dt">y=</span>fit<span class="op">$</span>W.[toprna,<span class="dv">2</span>]),</a>
+<a class="sourceLine" id="cb11-82" title="82">            <span class="dt">hjust =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dt">length.out =</span> <span class="kw">length</span>(toprna)),</a>
+<a class="sourceLine" id="cb11-83" title="83">            <span class="kw">aes</span>(<span class="dt">label =</span> names_rna)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-84" title="84"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Transcript joint loadings&quot;</span>,</a>
+<a class="sourceLine" id="cb11-85" title="85">       <span class="dt">x =</span> <span class="st">&quot;First Joint Loadings&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Second Joint Loadings&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-86" title="86"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">face=</span><span class="st">&#39;bold&#39;</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-87" title="87"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb11-88" title="88"></a>
+<a class="sourceLine" id="cb11-89" title="89"><span class="co">## Finally plot both plots in one figure.</span></a>
+<a class="sourceLine" id="cb11-90" title="90"><span class="kw">grid.arrange</span>(p_metab, p_rna, <span class="dt">ncol=</span><span class="dv">2</span>)</a></code></pre></div>
+<ul>
+<li>Write one paragraph about the relation between gene expression and metabolites based on the O2PLS results. What can we say about the top genes of the PCA fit?</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># The first component is interpreted as the VLDL component.  The second</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="co"># component is more or less the HDL vs VLDL component.  The corresponding</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="co"># genes in the second component seem to be involved in the immune system,</span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="co"># especially HLA-DRB5 and DEFA1.  This indicates that HDL vs VLDL</span></a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="co"># concentrations are linked to immunology.</span></a></code></pre></div>
+</div>
+</div>
+
+    </div>
+    <div class="col-xs-2">
+        <div class="btn-toolbar">
+    <div class="btn-group">
+    <a href="#" class="btn btn-raised btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text-muted">Code</span> <span class="text-muted caret"></span></a>
+    <ul class="dropdown-menu" style="min-width: 50px;">
+    <li><a id="rmd-show-all-code" href="#">Show All</a></li>
+    <li><a id="rmd-hide-all-code" href="#">Hide All</a></li>
+    </ul>
+    </div>
+    </div>
+        </div>
+  </div>
+  </div>
+  </div>
+  <div class="row">
+    </div>
+  </div>
+
+<script>
+$(document).ready(function () {
+  // add bootstrap table styles to pandoc tables
+  $('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
+
+    var images = $('.pages img');
+  images.filter(function() {
+      if ($(this).parent().attr("class") == "figure") {
+          return(false)
+      } else {
+          return(true);
+      }
+  }).wrap("<div class='figure'></div>");
+  images.addClass("image-thumb").wrap("<div class='panel-body'></div>");
+  $('.figure p.caption').wrap("<div class='panel-footer'></div>");
+  $('.figure').addClass('panel panel-default');
+  
+    $('.pages img')
+ 	  .addClass("image-lb");
+  $('.pages').magnificPopup({
+	      type:'image',
+	      closeOnContentClick: false,
+	      closeBtnInside: false,
+        delegate: 'img',
+	      gallery: {enabled: false },
+          removalDelay: 500,
+          callbacks: {
+              beforeOpen: function() {
+                // just a hack that adds mfp-anim class to markup
+                this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+              }
+          },
+          mainClass: 'mfp-move-from-top',
+	      image: {
+	        verticalFit: true,
+            titleSrc: 'alt'
+	      }
+ 	    });
+ 	
+    
+    $('#toc ul li').first().addClass("active");
+    $('#toc ul li').attr("data-target", function() {
+        return($(this).children("a").attr("href"));
+    })
+    $('body .section.level1').first().addClass("active");
+    
+    $('#toc a[href*="#"]').click(function() {
+
+      var id = $(this).attr("href");
+      if (id === "#") return;
+      if (id.substring(0, 8) === "#dyntab-") return;
+      toggle_page(id);
+
+      // Menu
+      var menu_entry = $(".menu li[data-target='"+id+"']");
+      menu_entry.addClass("active");
+      $(".menu li").not(menu_entry).removeClass("active"); 
+      
+
+    });
+
+    function toggle_page(id) {
+      $(".page").not(page).removeClass("active").hide();
+      window.page = id;
+      var page = $(window.page);
+      window.location.hash = window.page;
+      //$(this).addClass("active");
+
+      page.show();
+
+      var totop = setInterval(function () {
+        $(".pages").animate({scrollTop: 0}, 0);
+      }, 10);
+
+      setTimeout(function () {
+        page.addClass("active");
+        setTimeout(function () {
+          clearInterval(totop);
+        }, 1000);
+      }, 100);
+
+      window.dispatchEvent(new Event('resize'));
+
+    }
+
+
+    $(".menu li").click(function () {
+
+      toggle_page($(this).data("target"));
+
+      // Menu
+      if (!$(this).data("target")) return;
+      if ($(this).is(".active")) return;
+      $(".menu li").not($(this)).removeClass("active");
+      $(this).addClass("active");
+
+    });
+  
+    
+
+
+    window.page = window.location.hash;
+    if (window.page != "") {
+      $(".menu").find("li[data-target=" + window.page + "]").trigger("click");
+    }
+
+    /* init material bootstrap js */
+    $.material.init();
+});
+</script>
+
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

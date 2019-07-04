@@ -1,0 +1,255 @@
+---
+title: "Biostats for RNAseq - Day 2"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    highlight: kate
+    self_contained: FALSE
+    code_folding: hide
+---
+
+
+```{r setup, echo=FALSE, cache=FALSE, include=FALSE}
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(#echo=FALSE,
+	             #cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               eval = FALSE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
+```
+
+# Principal components analysis
+
+## Simulated example
+
+The simulated data consist of 100 samples and 100 "transcripts" in dataset X and 200 "regulatory regions" in dataset Y. 
+Furthermore, a continuous and binary outcome is available for prediction and visualisation.
+
+- Load the data. What are the dimensions of X and Y?
+
+```{r}
+library(gplots)
+## Load simulated data
+load("simulated_dataset_outcome_p100.RData")
+
+## We attach the dataset
+if(!exists("outcome_class")) attach(simulated_dataset_outcome)
+cat("dimensions of X:", dim(X), "\n")
+cat("dimensions of Y:", dim(Y), "\n")
+```
+
+- In the code below a function is defined to plot a heatmap of the correlations between the simulated genes and regions. Plot the two heatmaps, as well as boxplots of the data. Do you see some structure in the data?
+
+```{r}
+## we need the gplots package
+hm <- function(X){
+  gplots::heatmap.2(cor(X), Rowv = FALSE, Colv = FALSE, dendrogram = "none", 
+                    col = gplots::bluered(100), trace = "none")
+}
+## Some descriptives
+boxplot(X)
+boxplot(Y)
+hm(X)
+hm(Y)
+```
+
+- Now, a PCA is performed to inspect the structure of the data. First, we define how to do PCA using a computationally efficient algorithm. The output is an object recognized by `prcomp`. The `loadings` object contain the actual loadings.
+
+```{r}
+princomp_fast <- function(x, nr_comp){
+  x <- scale(x, scale = FALSE)
+  s <- svd(x, nr_comp, nr_comp)
+  ret <- list(sdev = s$d[1:nr_comp], loadings = structure(s$v, class="loadings"), 
+              center = TRUE, scale = FALSE, n.obs = nrow(x), call = "Fast princomp",
+              scores = s$u %*% diag(s$d[1:nr_comp],nr_comp))
+  class(ret) <- "princomp"
+  ret
+}
+```
+
+- Fit a PCA to the X data. How many components seem reasonable? Why? 
+- Plot the first two loading components against each other. Also plot the first two scores. Which genes and samples are influential? You can use `identify` to identify points
+
+```{r}
+princomp_fast(X, 20)
+princomp_fast(X, 6)
+
+fit_pca <- princomp_fast(X, 6)
+plot(fit_pca$loadings)
+# identify(fit_pca$loadings)
+plot(fit_pca$scores)
+```
+
+- Now add some color to the scoresplot, use the `outcome_class+1` as labels. Any remarkable grouping? NB we will revisit these data using O2PLS. 
+
+```{r}
+plot(fit_pca$scores, col = outcome_class+1)
+```
+
+## (Optional) Similar analysis
+
+Repeat similar analysis, but use the `simulated_dataset_outcome_p1e4.RData` datasets. Note that these data are of much higher dimension, so be careful not to crash your laptop (before saving your data).
+
+# Data integration with O2PLS
+
+## Simulated example
+
+- Fit an O2PLS model to the X and Y datasets, using 3 joint and 3 specific components for both. 
+
+```{r}
+library(OmicsPLS)
+fit <- o2m(X, Y, 3, 3, 3)
+```
+
+- Plot the loadings of the O2PLS fit using `plot`. You can press `tab` to find out more about the arguments of the plot function. 
+
+```{r}
+plot(fit, "Xj", 1, 2)
+plot(fit, "Yj", 1, 2)
+```
+
+- Now plot the scores and add some color to the scoresplot, use the `outcome_class+1` as labels. Any remarkable grouping or pattern?
+
+```{r}
+par(mfrow=c(2,1))
+plot(scores(fit, "Xj"), col = outcome_class+1)
+plot(scores(fit, "Yj"), col = outcome_class+1)
+par(mfrow=c(1,1))
+```
+
+
+## Real data example
+
+
+Here, we will use microarray gene expression data and metabolite abundances to illustrate the O2PLS integration. 
+- Load the data that are stored in `rna_metab.RData`. Inspect the data using boxplots and a heatmap.
+```{r}
+load("rna_metab.RData")
+dim(rna)
+dim(metab)
+boxplot(metab)
+boxplot(rna[,1:100])
+hm(metab)
+```
+
+- Now fit a pca model with 2 components and an O2PLS model with 2 joint, 1 rna-specific and 10 metabolite-specific components to the data.
+
+```{r}
+fit_pca_rna <- princomp_fast(rna, 2)
+fit_pca_metab <- princomp_fast(metab, 2)
+fit_o2m <- o2m(rna, metab, 2, 1, 10)
+fit <- fit_o2m
+```
+
+- Run the code below, perhaps you need to install some packages. Briefly, the code plots the loadings of the metabolite and expression data of the first two components. It also annotates top genes as well as metabolite grouping. Uncomment the first two lines and comment out the third line to plot the loadings of the PCA fit. 
+
+```{r}
+#fit$W. <- fit_pca_rna$loadings
+#fit$C. <- fit_pca_metab$loadings
+fit <- fit_o2m
+
+library(magrittr)
+library(ggplot2)
+library(gridExtra)
+library(illuminaHumanv3.db)
+# Color names
+LLmodule <- c("ILMN_1690209",'ILMN_1766551', 'ILMN_1749131', 'ILMN_1688423', 
+              'ILMN_2102670', 'ILMN_1792323', 'ILMN_1899034', 'ILMN_1806721', 
+              'ILMN_1695530', 'ILMN_1726114', 'ILMN_1751625', 'ILMN_1726114', 
+              'ILMN_1753648', 'ILMN_1779043')
+LLnr <- which(colnames(rna) %in% LLmodule)
+rna_genenames <- select(illuminaHumanv3.db, 
+                        keys = colnames(rna)[LLnr], 
+                        keytype = "PROBEID", columns = "SYMBOL")[,2]
+
+name_col <- 1 + sapply( #First sapply loops over column names
+  X = colnames(metab),
+  FUN = function(arg){
+    crossprod(
+      c(1, 1, 3, 4, 5), # Weights to be used as categories
+      sapply(c("VLDL", "LDL", "IDL", "HDL","FA"), # metabolite classes
+             function(arg2){grepl(arg2, arg)} # compare class of metabolites
+      )
+    )
+    }
+  )
+name_col <- factor(name_col, 
+                   levels = c(3,2,4:6,1), 
+                   labels = c("VLDL", "LDL", "IDL", "HDL","FA","Other"))
+
+# alpmetab <- loadings(fit, "Yjoint", 1:2) %>%  # Retreive loadings
+#   abs %>% # Absolute loading values for positive weights
+#   rowSums %>% # Sum over the components
+#   sqrt + (name_col!="Other") # Take square root
+
+######### Plot loadings with OmicsPLS plot method ###
+p_metab <- plot(fit, loading_name="Yj", i=1, j=2, label="c", # Plot the loadings
+             alpha=0) + # set points to be 100% transparant
+##################### Add all layers ###
+  theme_bw() +
+  coord_fixed(ratio = 1, xlim=c(-.2,.2),ylim=c(-.2,.2)) +
+  geom_point( # Set color and size
+    aes(col=name_col, size = I(1+(name_col%in%c("VLDL","HDL"))), 
+          shape = name_col),show.legend = T) +
+  theme(legend.position="right") +
+  scale_color_discrete(name="Metabolite\nGroup",
+                       labels=c("VLDL", "LDL", "IDL", "HDL","FA","Other")) +
+  guides(size=F) + scale_shape_discrete(name="Metabolite\nGroup",
+                                labels=c("VLDL", "LDL", "IDL", "HDL","FA","Other")) +
+  scale_shape_manual(name="Metabolite\nGroup", values=c(15,3,4,17,5,6)) + 
+  labs(title = "Metabolite joint loadings",
+       x = "First Joint Loadings", y = "Second Joint Loadings") +
+  theme(plot.title = element_text(face='bold'),
+        legend.title=element_text(face='bold')) + 
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+
+alprna <- loadings(fit, "Xjoint", 1:2) %>% raise_to_power(2) %>% rowSums
+alprna[-(order(alprna,decreasing=T)[1:10])] = 0
+alprna <- sign(alprna)
+toprna <- which(alprna>0)
+names_rna <- mapIds(illuminaHumanv3.db, 
+       keys = colnames(rna)[toprna], 
+       keytype = "PROBEID", 
+       column = "SYMBOL",
+       multiVals = 'first')
+names_rna[which(is.na(names_rna))] <- "?"
+######### Plot loadings with OmicsPLS plot method ###
+p_rna <- ggplot(data.frame(x = fit$W.[, 1], y = fit$W.[, 2]), 
+                aes(x = x, y = y),
+                alpha = alprna,
+                aes(label = NA)) +
+    ##################### Add all layers ###
+  theme_bw() +
+  coord_fixed(.8, c(-.15,.15),c(-.15,.15)) +
+  geom_point(alpha = 0.5, col = 'grey') +
+  geom_point(data = data.frame(x=fit$W.[LLnr,1],y=fit$W.[LLnr,2]),
+             shape = 2, col = 2, size = 2) + 
+  geom_text(data = data.frame(x=fit$W.[toprna,1],y=fit$W.[toprna,2]),
+            hjust = rep(c(1, 0), length.out = length(toprna)),
+            aes(label = names_rna)) + 
+  labs(title = "Transcript joint loadings",
+       x = "First Joint Loadings", y = "Second Joint Loadings") +
+  theme(plot.title = element_text(face='bold')) + 
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+
+## Finally plot both plots in one figure.
+grid.arrange(p_metab, p_rna, ncol=2)
+```
+
+- Write one paragraph about the relation between gene expression and metabolites based on the O2PLS results. What can we say about the top genes of the PCA fit?
+
+```{r}
+#The first component is interpreted as the VLDL component. 
+#The second component is more or less the HDL vs VLDL component. 
+#The corresponding genes in the second component seem to be involved in the immune system, especially HLA-DRB5 and DEFA1. 
+#This indicates that HDL vs VLDL concentrations are linked to immunology.
+```
+
